@@ -7,6 +7,8 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Tymon\JWTAuth\Exceptions\JWTException;
 
 class UsersController extends Controller
 {
@@ -47,20 +49,36 @@ class UsersController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $user = User::where('email', $request->email)->first();
+        $credentials = $request->only('email', 'password');
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return response()->json(['message' => 'Invalid email or password'], 401);
+        if (! $token = JWTAuth::attempt($credentials)) {
+            return response()->json(['message' => 'Invalid credentials'], 401);
         }
 
-        // Optionally check device_id here, or update it
-
-        $token = $user->createToken('api-token')->plainTextToken;
+        $user = JWTAuth::user();
 
         return response()->json([
             'message' => 'Login successful',
             'token' => $token,
             'user' => $user
         ], 200);
+    }
+
+    // PROFILE method
+    public function profile()
+    {
+        return response()->json(auth()->user());
+    }
+
+    // LOGOUT method (invalidate token and logout user)
+    public function logout()
+    {
+        try {
+            // Invalidate the current JWT token
+            JWTAuth::invalidate(JWTAuth::getToken());
+            return response()->json(['message' => 'Successfully logged out and token invalidated']);
+        } catch (JWTException $e) {
+            return response()->json(['message' => 'Failed to logout, token invalidation error'], 500);
+        }
     }
 }

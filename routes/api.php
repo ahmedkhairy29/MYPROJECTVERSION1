@@ -8,7 +8,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-// Public login route
-Route::post('/login', [UsersController::class, 'login']);
 
+Route::post('/login', [UsersController::class, 'login']);
 Route::post('/register', [UsersController::class, 'register']);
+
+Route::middleware(['auth:api'])->group(function () {
+    Route::get('/profile', [UsersController::class, 'profile']); 
+    Route::post('/logout', [UsersController::class, 'logout']);
+});
