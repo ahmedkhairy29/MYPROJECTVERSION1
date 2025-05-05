@@ -67,7 +67,11 @@ class UsersController extends Controller
     // PROFILE method
     public function profile()
     {
-        return response()->json(auth()->user());
+        return response()->json([
+            'user' => auth()->user(),
+            'id' => auth()->id(),
+            'token_user' => JWTAuth::user()
+        ]);
     }
 
     // LOGOUT method (invalidate token and logout user)
