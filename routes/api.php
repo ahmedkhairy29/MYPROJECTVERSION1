@@ -1,25 +1,29 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UsersController;
-
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
-
+use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\ApiActivateController;
+use Illuminate\Http\Request;
 
 Route::post('/login', [UsersController::class, 'login']);
 Route::post('/register', [UsersController::class, 'register']);
 
 Route::middleware(['jwt.verify'])->group(function () {
-    Route::get('/profile', [UsersController::class, 'profile']); 
+    Route::get('/profile', [UsersController::class, 'profile']);
     Route::post('/logout', [UsersController::class, 'logout']);
 
-
-    Route::post('/departments', [UsersController::class, 'addDepartment']);
-    Route::put('/departments/{id}', [UsersController::class, 'updateDepartment']);
-    Route::delete('/departments/{id}', [UsersController::class, 'deleteDepartment']);
-    Route::get('/departments', [UsersController::class, 'getDepartments']);
+    Route::post('/departments', [DepartmentController::class, 'addDepartment']);
+    Route::put('/departments/{id}', [DepartmentController::class, 'updateDepartment']);
+    Route::delete('/departments/{id}', [DepartmentController::class, 'deleteDepartment']);
+    Route::get('/departments', [DepartmentController::class, 'getDepartments']);
+    Route::get('/user', function (Request $request) {
+        return response()->json(auth()->user());
+    });
 });
-Route::get('/activate/{token}', [UsersController::class, 'activate']);
+
+// Activation routes (choose only one controller)
+Route::get('/activate/{token}', [ApiActivateController::class, 'activate']);
+Route::post('/activate-user', [ApiActivateController::class, 'manualActivate']);
+Route::post('/activate-token', [ApiActivateController::class, 'activateWithToken']);
+

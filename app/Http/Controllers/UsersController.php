@@ -10,8 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\UserActivationMail;
+use App\Models\Department;
 
 
 class UsersController extends Controller
@@ -35,133 +34,68 @@ class UsersController extends Controller
             'password' => 'required|min:6',
             'device_id' => 'required'
         ]);
-
+    
         if ($validator->fails()) {
             return $this->responseJson(false, 'Validation failed', $validator->errors(), 422);
         }
-
+    
         $user = User::create([
             'name' => $request->name,
-        'email' => $request->email,
-        'password' => Hash::make($request->password),
-        'device_id' => $request->device_id,
-        'activation_token' => Str::random(60),
-        'is_active' => false
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'device_id' => $request->device_id,
+            'activation_token' => Str::random(60),
+            'is_active' => false
         ]);
-
-        Mail::to($user->email)->send(new UserActivationMail($user));
-
-    return $this->responseJson(true, 'User registered successfully. Please check your email for activation.', $user, 201);
-    } 
-
-
-    public function activate($token)
-{
-    $user = User::where('activation_token', $token)->first();
-
-    if (!$user) {
-        return $this->responseJson(false, 'Invalid or expired activation token', null, 400);
+    
+        // Comment out email if you want manual activation only
+        // Mail::to($user->email)->send(new UserActivationMail($user));
+    
+        return $this->responseJson(true, 'User registered. Use /api/activate/{token} to activate.', $user, 201);
     }
-
-    // Activate the user and clear the activation token
-    $user->is_active = true;
-    $user->activation_token = null;
-    $user->save();
-
-    return $this->responseJson(true, 'Account successfully activated', null, 200);
-}
-public function addDepartment(Request $request)
-{
-    $validator = Validator::make($request->all(), [
-        'name' => 'required|string|max:255'
-    ]);
-
-    if ($validator->fails()) {
-        return $this->responseJson(false, 'Validation failed', $validator->errors(), 422);
-    }
-
-    $department = Department::create([
-        'name' => $request->name,
-        'user_id' => auth()->id() // Associate department with the logged-in user
-    ]);
-
-    return $this->responseJson(true, 'Department created successfully', $department, 201);
-}
-public function updateDepartment(Request $request, $id)
-{
-    $validator = Validator::make($request->all(), [
-        'name' => 'required|string|max:255'
-    ]);
-
-    if ($validator->fails()) {
-        return $this->responseJson(false, 'Validation failed', $validator->errors(), 422);
-    }
-
-    $department = Department::where('user_id', auth()->id())->find($id);
-
-    if (!$department) {
-        return $this->responseJson(false, 'Department not found', null, 404);
-    }
-
-    $department->update([
-        'name' => $request->name
-    ]);
-
-    return $this->responseJson(true, 'Department updated successfully', $department, 200);
-}
-public function deleteDepartment($id)
-{
-    $department = Department::where('user_id', auth()->id())->find($id);
-
-    if (!$department) {
-        return $this->responseJson(false, 'Department not found', null, 404);
-    }
-
-    $department->delete();
-
-    return $this->responseJson(true, 'Department deleted successfully', null, 200);
-}
-public function getDepartments()
-{
-    $departments = auth()->user()->departments()->get();
-
-
-    return $this->responseJson(true, 'Departments fetched successfully', $departments, 200);
-}
-
-
-
+     
     // LOGIN method
     public function login(Request $request)
-{
-    $validator = Validator::make($request->all(), [
-        'email' => 'required|email',
-        'password' => 'required',
-        'device_id' => 'required'
-    ]);
-
-    if ($validator->fails()) {
-        return $this->responseJson(false, 'Validation failed', $validator->errors(), 422);
+    {
+        $credentials = $request->only('email', 'password');
+    
+        $validator = Validator::make($credentials, [
+            'email' => 'required|email',
+            'password' => 'required|string|min:6'
+        ]);
+    
+        if ($validator->fails()) {
+            return $this->responseJson(false, 'Validation failed', $validator->errors(), 422);
+        }
+    
+        $user = User::where('email', $credentials['email'])->first();
+    
+        if (!$user) {
+            return $this->responseJson(false, 'Invalid credentials', null, 401);
+        }
+    
+        if (!$user->is_active) {
+            return $this->responseJson(false, 'Account is not activated. Please check your email.', null, 400);
+        }
+    
+        if (!Hash::check($credentials['password'], $user->password)) {
+            return $this->responseJson(false, 'Invalid credentials', null, 401);
+        }
+    
+        try {
+            if (!$token = JWTAuth::attempt($credentials)) {
+                return $this->responseJson(false, 'Login failed', null, 401);
+            }
+        } catch (JWTException $e) {
+            return $this->responseJson(false, 'Could not create token', null, 500);
+        }
+    
+        return $this->responseJson(true, 'Login successful', [
+            'token' => $token,
+            'user' => $user
+        ]);
     }
-
-    $credentials = $request->only('email', 'password');
-
-    if (! $token = JWTAuth::attempt($credentials)) {
-        return $this->responseJson(false, 'Invalid credentials', null, 401);
-    }
-
-    $user = JWTAuth::user();
-
-    // Check if the user is active
-    if (!$user->is_active) {
-        return $this->responseJson(false, 'Account is not activated. Please check your email.', null, 400);
-    }
-
-    return $this->responseJson(true, 'Login successful', [
-        'token' => $token,
-        'user' => $user
-    ], 200);
-}
+    
 
 
     // PROFILE method

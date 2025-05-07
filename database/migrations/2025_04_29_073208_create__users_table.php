@@ -4,16 +4,16 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+class CreateusersTable extends Migration
 {
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('activation_token')->nullable()->unique();
-            $table->boolean('is_active')->default(false);
+            $table->boolean('is_active')->default(false)->after('email_verified_at');
+            $table->string('activation_token', 60)->nullable()->after('is_active');
         });
     }
 
@@ -21,12 +21,10 @@ return new class extends Migration
      * Reverse the migrations.
      */
     public function down(): void
-{
-    Schema::table('users', function (Blueprint $table) {
-        $table->dropColumn(['activation_token', 'is_active']);
-    });
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn(['is_active', 'activation_token']);
+        });
+    }
 }
-
-};
-
 
