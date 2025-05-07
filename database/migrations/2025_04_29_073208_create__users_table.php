@@ -12,7 +12,8 @@ return new class extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('device_id')->nullable();
+            $table->string('activation_token')->nullable()->unique();
+            $table->boolean('is_active')->default(false);
         });
     }
 
@@ -22,7 +23,7 @@ return new class extends Migration
     public function down(): void
 {
     Schema::table('users', function (Blueprint $table) {
-        $table->dropColumn('device_id');
+        $table->dropColumn(['activation_token', 'is_active']);
     });
 }
 

@@ -12,7 +12,14 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('/login', [UsersController::class, 'login']);
 Route::post('/register', [UsersController::class, 'register']);
 
-Route::middleware(['auth:api'])->group(function () {
+Route::middleware(['jwt.verify'])->group(function () {
     Route::get('/profile', [UsersController::class, 'profile']); 
     Route::post('/logout', [UsersController::class, 'logout']);
+
+
+    Route::post('/departments', [UsersController::class, 'addDepartment']);
+    Route::put('/departments/{id}', [UsersController::class, 'updateDepartment']);
+    Route::delete('/departments/{id}', [UsersController::class, 'deleteDepartment']);
+    Route::get('/departments', [UsersController::class, 'getDepartments']);
 });
+Route::get('/activate/{token}', [UsersController::class, 'activate']);
