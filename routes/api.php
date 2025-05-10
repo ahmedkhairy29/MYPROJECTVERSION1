@@ -3,13 +3,21 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\DepartmentController;
-use App\Http\Controllers\ApiActivateController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\ActivateController;
 use Illuminate\Http\Request;
 
-Route::post('/login', [UsersController::class, 'login']);
-Route::post('/register', [UsersController::class, 'register']);
+Route::post('/register', [RegisterController::class, 'register']);
+Route::post('/login', [LoginController::class, 'login']);
+
+Route::get('/activate/{token}', [ActivateController::class, 'activate']);
+Route::post('/activate-user', [ActivateController::class, 'manualActivate']);
+Route::post('/activate-token', [ActivateController::class, 'activateWithToken']);
+
 
 Route::middleware(['auth:api'])->group(function () {
+    
     Route::get('/profile', [UsersController::class, 'profile']);
     Route::post('/logout', [UsersController::class, 'logout']);
 
@@ -22,8 +30,5 @@ Route::middleware(['auth:api'])->group(function () {
     });
 });
 
-// Activation routes (choose only one controller)
-Route::get('/activate/{token}', [ApiActivateController::class, 'activate']);
-Route::post('/activate-user', [ApiActivateController::class, 'manualActivate']);
-Route::post('/activate-token', [ApiActivateController::class, 'activateWithToken']);
+
 

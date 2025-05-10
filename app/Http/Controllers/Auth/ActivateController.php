@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Auth;
 
-use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
-class ApiActivateController extends Controller
+class ActivateController extends Controller
 {
     protected function responseJson($status, $message, $data = null, $code = 200)
     {
@@ -16,7 +17,7 @@ class ApiActivateController extends Controller
         ], $code);
     }
 
-    // 1. Activate using the token in the URL
+  
     public function activate($token)
     {
         $user = User::where('activation_token', $token)->first();
@@ -24,7 +25,7 @@ class ApiActivateController extends Controller
         if (!$user) {
             return $this->responseJson(false, 'Invalid or expired activation token', null, 404);
         }
-
+        
         $user->is_active = true;
         $user->activation_token = null; // clear token after activation
         $user->save();
@@ -32,7 +33,7 @@ class ApiActivateController extends Controller
         return $this->responseJson(true, 'Account activated successfully', $user);
     }
 
-    // 2. Manual activation (e.g., admin side)
+   
     public function manualActivate(Request $request)
     {
         $request->validate([
@@ -56,7 +57,7 @@ class ApiActivateController extends Controller
         return $this->responseJson(true, 'User manually activated successfully', $user);
     }
 
-    // 3. Activate with token sent in the body
+    
     public function activateWithToken(Request $request)
     {
         $request->validate([

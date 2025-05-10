@@ -25,76 +25,8 @@ class UsersController extends Controller
         ], $code);
     }
 
-    // REGISTER method
-    public function register(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:6',
-            'device_id' => 'required'
-        ]);
-    
-        if ($validator->fails()) {
-            return $this->responseJson(false, 'Validation failed', $validator->errors(), 422);
-        }
-    
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'device_id' => $request->device_id,
-            'activation_token' => Str::random(60),
-            'is_active' => false
-        ]);
-    
-        // Comment out email if you want manual activation only
-        // Mail::to($user->email)->send(new UserActivationMail($user));
-    
-        return $this->responseJson(true, 'User registered. Use /api/activate/{token} to activate.', $user, 201);
-    }
+   
      
-    // LOGIN method
-    public function login(Request $request)
-    {
-        $credentials = $request->only('email', 'password');
-    
-        $validator = Validator::make($credentials, [
-            'email' => 'required|email',
-            'password' => 'required|string|min:6'
-        ]);
-    
-        if ($validator->fails()) {
-            return $this->responseJson(false, 'Validation failed', $validator->errors(), 422);
-        }
-    
-        $user = User::where('email', $credentials['email'])->first();
-    
-        if (!$user) {
-            return $this->responseJson(false, 'Invalid credentials', null, 401);
-        }
-    
-        if (!$user->is_active) {
-            return $this->responseJson(false, 'Account is not activated. Please check your email.', null, 400);
-        }
-    
-        if (!Hash::check($credentials['password'], $user->password)) {
-            return $this->responseJson(false, 'Invalid credentials', null, 401);
-        }
-    
-        try {
-            if (!$token = JWTAuth::attempt($credentials)) {
-                return $this->responseJson(false, 'Login failed', null, 401);
-            }
-        } catch (JWTException $e) {
-            return $this->responseJson(false, 'Could not create token', null, 500);
-        }
-    
-        return $this->responseJson(true, 'Login successful', [
-            'token' => $token,
-            'user' => $user
-        ]);
-    }
     
 
 
