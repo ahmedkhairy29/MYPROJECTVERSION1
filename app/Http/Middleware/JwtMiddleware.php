@@ -15,7 +15,7 @@ class JwtMiddleware extends BaseMiddleware
     {
         try {
             $user = JWTAuth::parseToken()->authenticate();
-            auth()->setUser($user); // Set user in the Laravel auth context
+            auth()->setUser($user); 
         } catch (TokenExpiredException $e) {
             return response()->json([
                 'status' => false,

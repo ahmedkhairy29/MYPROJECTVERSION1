@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 Route::post('/login', [UsersController::class, 'login']);
 Route::post('/register', [UsersController::class, 'register']);
 
-Route::middleware(['jwt.verify'])->group(function () {
+Route::middleware(['auth:api'])->group(function () {
     Route::get('/profile', [UsersController::class, 'profile']);
     Route::post('/logout', [UsersController::class, 'logout']);
 
