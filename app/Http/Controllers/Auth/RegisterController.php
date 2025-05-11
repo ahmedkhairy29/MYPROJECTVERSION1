@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
-use Str;
+
 
 class RegisterController extends Controller
 {
@@ -46,6 +46,6 @@ class RegisterController extends Controller
          // Comment out email if you want manual activation only
          // Mail::to($user->email)->send(new UserActivationMail($user));
      
-         return $this->responseJson(true, 'User registered. Use /api/activate/{token} to activate.', $user, 201);
+         return $this->responseJson(true, 'User registered. Use /api/activate-user to activate.', $user, 201);
      }
 }

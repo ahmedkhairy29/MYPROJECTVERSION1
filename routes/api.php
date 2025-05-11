@@ -11,9 +11,7 @@ use Illuminate\Http\Request;
 Route::post('/register', [RegisterController::class, 'register']);
 Route::post('/login', [LoginController::class, 'login']);
 
-Route::get('/activate/{token}', [ActivateController::class, 'activate']);
-Route::post('/activate-user', [ActivateController::class, 'manualActivate']);
-Route::post('/activate-token', [ActivateController::class, 'activateWithToken']);
+Route::post('/activate-user', [ActivateController::class, 'activateByEmail']);
 
 
 Route::middleware(['auth:api'])->group(function () {
