@@ -25,41 +25,25 @@ class LoginController extends Controller
 
     public function login(Request $request)
     {
-        $credentials = $request->only('email', 'password');
-    
-        $validator = Validator::make($credentials, [
+        // Validate the incoming request
+        $validator = Validator::make($request->all(), [
             'email' => 'required|email',
             'password' => 'required|string|min:6'
         ]);
-    
+
+        // If validation fails, return error response
         if ($validator->fails()) {
             return $this->responseJson(false, 'Validation failed', $validator->errors(), 422);
         }
-    
-       $user = User::where('email', $credentials['email'])->first();
 
-        // Check credentials and user status
-        if (!$user || !Hash::check($credentials['password'], $user->password)) {
+        // Attempt to log the user in with credentials
+        if (!$token = JWTAuth::attempt($request->only('email', 'password'))) {
             return $this->responseJson(false, 'Invalid credentials', null, 401);
         }
 
-        if (!$user->is_active) {
-            return $this->responseJson(false, 'Account is not activated. Please check your email.', null, 403);
-        }
-        
-    
-        try {
-            if (!$token = JWTAuth::attempt($credentials)) {
-                return $this->responseJson(false, 'Login failed', null, 401);
-            }
-        } catch (JWTException $e) {
-            return $this->responseJson(false, 'Could not create token', null, 500);
-        }
-    
-        return $this->responseJson(true, 'Login successful', [
-            'token' => $token,
-            'user' => $user
+        // Return the token
+        return $this->responseJson(true, 'User logged in successfully', [
+            'token' => $token
         ]);
     }
-    
 }

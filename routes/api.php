@@ -15,6 +15,8 @@ Route::post('/activate-user', [ActivateController::class, 'activateByEmail']);
 
 
 Route::middleware(['auth:api'])->group(function () {
+    return response()->json(auth()->user());
+});
     
     Route::get('/profile', [UsersController::class, 'profile']);
     Route::post('/logout', [UsersController::class, 'logout']);
@@ -24,8 +26,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::delete('/departments/{id}', [DepartmentController::class, 'deleteDepartment']);
     Route::get('/departments', [DepartmentController::class, 'getDepartments']);
     Route::get('/user', function (Request $request) {
-        return response()->json(auth()->user());
-    });
+       
 });
 
 

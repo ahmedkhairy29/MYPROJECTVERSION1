@@ -48,7 +48,7 @@ class RegisterController extends Controller
          return $this->responseJson(true, 'User registered. Use /api/activate-user to activate.', [
             'name' => $user->name,
             'email' => $user->email,
-            'activation_token' => $user->activation_token
+            'activation_token' => $activationToken
         ], 201);
      }
-}
+} 

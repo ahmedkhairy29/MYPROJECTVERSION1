@@ -48,4 +48,4 @@ class ActivateController extends Controller
             'email' => $user->email
         ]);
     }
-}
+} 
