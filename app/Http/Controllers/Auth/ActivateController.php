@@ -19,29 +19,31 @@ class ActivateController extends Controller
     }
 
     public function activateByEmail(Request $request)
-    
     {
         $request->validate([
-            'email' => 'required|email'
+            'email' => 'required|email',
+            'activation_token' => 'required|string'
         ]);
-
-       
-        $user = User::where('email', $request->email)->first();
-
-        
+    
+        $user = User::where('email', $request->email)
+                    ->where('activation_token', $request->activation_token)
+                    ->first();
+    
         if (!$user) {
-            return $this->responseJson(false, 'User not found', null, 404);
+            return $this->responseJson(false, 'Invalid email or activation token', null, 404);
         }
-
-        
+    
         if ($user->is_active) {
             return $this->responseJson(false, 'User is already activated', null, 400);
         }
-
-        
+    
         $user->is_active = true;
+        $user->activation_token = null; // Optional: clear the token
         $user->save();
-
-        return $this->responseJson(true, 'User activated successfully', $user);
+    
+        return $this->responseJson(true, 'User activated successfully', [
+            'name' => $user->name,
+            'email' => $user->email
+        ]);
     }
 }
