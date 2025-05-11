@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 
 class RegisterController extends Controller
@@ -26,7 +27,7 @@ class RegisterController extends Controller
          $validator = Validator::make($request->all(), [
              'name' => 'required|string|max:255',
              'email' => 'required|email|unique:users,email',
-             'password' => 'required|min:6',
+             'password' => 'required|string|min:6|confirmed',
              'device_id' => 'required'
          ]);
      
@@ -43,9 +44,11 @@ class RegisterController extends Controller
              'is_active' => false
          ]);
      
-         // Comment out email if you want manual activation only
-         // Mail::to($user->email)->send(new UserActivationMail($user));
-     
-         return $this->responseJson(true, 'User registered. Use /api/activate-user to activate.', $user, 201);
+        
+         return $this->responseJson(true, 'User registered. Use /api/activate-user to activate.', [
+            'name' => $user->name,
+            'email' => $user->email,
+            'activation_token' => $user->activation_token
+        ], 201);
      }
 }
