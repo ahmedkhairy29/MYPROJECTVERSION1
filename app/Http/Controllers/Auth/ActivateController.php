@@ -6,6 +6,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
+use JWTAuth;
+use Tymon\JWTAuth\Exceptions\JWTException;
 
 class ActivateController extends Controller
 {
@@ -21,16 +23,17 @@ class ActivateController extends Controller
     public function activateByEmail(Request $request)
     {
         $request->validate([
-            'email' => 'required|email',
-            'activation_token' => 'required|string'
+            'token' => 'required|string'
         ]);
     
-        $user = User::where('email', $request->email)
-                    ->where('activation_token', $request->activation_token)
-                    ->first();
+        try {
+            $user = JWTAuth::setToken($request->token)->authenticate();
+        } catch (JWTException $e) {
+            return $this->responseJson(false, 'Invalid or expired token', null, 401);
+        }
     
         if (!$user) {
-            return $this->responseJson(false, 'Invalid email or activation token', null, 404);
+            return $this->responseJson(false, 'User not found', null, 404);
         }
     
         if ($user->is_active) {
@@ -38,7 +41,6 @@ class ActivateController extends Controller
         }
     
         $user->is_active = true;
-        $user->activation_token = null; // Optional: clear the token
         $user->save();
     
         return $this->responseJson(true, 'User activated successfully', [

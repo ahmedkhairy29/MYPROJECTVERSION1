@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
+use JWTAuth;
 
 
 class RegisterController extends Controller
@@ -40,10 +40,10 @@ class RegisterController extends Controller
              'email' => $request->email,
              'password' => Hash::make($request->password),
              'device_id' => $request->device_id,
-             'activation_token' => Str::random(60),
              'is_active' => false
          ]);
-     
+            
+              $activationToken = JWTAuth::fromUser($user);
         
          return $this->responseJson(true, 'User registered. Use /api/activate-user to activate.', [
             'name' => $user->name,
