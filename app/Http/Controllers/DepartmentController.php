@@ -28,6 +28,7 @@ class DepartmentController extends Controller
         }
     
         $user = auth()->user();
+        \Log::info("Creating department for user: {$user->id}");
 
         $department = $user->departments()->create([
             'name' => $request->name
@@ -77,11 +78,15 @@ class DepartmentController extends Controller
 
     public function getDepartments()
     {
-        $departments = auth()->user()->departments()->latest()->paginate(10);
-
-
+        $departments = auth()->user()->departments;
     
+        // Check if departments are loaded
+        if ($departments->isEmpty()) {
+            return $this->responseJson(false, 'No departments found for this user', null, 404);
+        }
     
-        return $this->responseJson(true, 'Departments fetched successfully', $departments, 200);
-    } 
+        return $this->responseJson(true, 'Departments retrieved successfully', $departments);
+    }
+    
+
 }

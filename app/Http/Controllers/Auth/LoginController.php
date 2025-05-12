@@ -24,26 +24,28 @@ class LoginController extends Controller
 
 
     public function login(Request $request)
-    {
-        // Validate the incoming request
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
-            'password' => 'required|string|min:6'
-        ]);
+{
+    $validator = Validator::make($request->all(), [
+        'email' => 'required|email',
+        'password' => 'required|string|min:6',
+    ]);
 
-        // If validation fails, return error response
-        if ($validator->fails()) {
-            return $this->responseJson(false, 'Validation failed', $validator->errors(), 422);
-        }
+    if ($validator->fails()) {
+        return $this->responseJson(false, 'Validation failed', $validator->errors(), 422);
+    }
 
-        // Attempt to log the user in with credentials
+    try {
         if (!$token = JWTAuth::attempt($request->only('email', 'password'))) {
             return $this->responseJson(false, 'Invalid credentials', null, 401);
         }
-
-        // Return the token
-        return $this->responseJson(true, 'User logged in successfully', [
-            'token' => $token
-        ]);
+    } catch (JWTException $e) {
+        return $this->responseJson(false, 'Could not create token', null, 500);
     }
+
+    return $this->responseJson(true, 'User logged in successfully', [
+        'token' => $token
+    ]);
+}
+
+
 }
