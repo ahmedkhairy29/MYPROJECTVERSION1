@@ -27,36 +27,22 @@ class UsersController extends Controller
 
 
     public function profile()
-    {
-        // Eager load the departments along with the user
-        $user = auth()->user()->load('departments');
-    
-        // Return the user profile with departments
-        return $this->responseJson(true, 'User profile retrieved successfully', $user);
-    }
-
-
-    public function getUserProfile()
 {
     $user = auth()->user();
 
     if (!$user) {
-        return $this->responseJson(false, 'User not found', null, 404);
+        return response()->json([
+            'success' => false,
+            'message' => 'Unauthorized. Please log in.',
+        ], 401);
     }
-    $user = auth()->user()->load('departments');
-    \Log::info($user);  // Log the user object to check if departments are loaded
 
-    return $this->responseJson(true, 'User profile retrieved successfully', $user);
-
-    $user = $user->load('departments');  
+    $user->load('departments');
 
     return $this->responseJson(true, 'User profile retrieved successfully', $user);
 }
-    
 
-    
-    
-    
+
     public function logout()
     {
         try {

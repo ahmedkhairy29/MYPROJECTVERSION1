@@ -13,9 +13,9 @@ Route::post('/login', [LoginController::class, 'login'])->name('login');
 
 Route::post('/activate-user', [ActivateController::class, 'activateByEmail']);
 
-Route::middleware(['auth:api'])->group(function () {
+Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/profile', [UsersController::class, 'profile']);
-    Route::get('/profile', [UsersController::class, 'getUserProfile']);
+   // Route::get('/profile', [UsersController::class, 'getUserProfile']);
     Route::post('/logout', [UsersController::class, 'logout']);
     
     
