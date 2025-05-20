@@ -9,9 +9,7 @@ class UserDepartment extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'title',
-        'description',
-        'status',
+        
         'department_id',
         'user_id'
     ];

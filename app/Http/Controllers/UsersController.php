@@ -27,20 +27,13 @@ class UsersController extends Controller
 
 
     public function profile()
-{
-    $user = auth()->user();
-
-    if (!$user) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Unauthorized. Please log in.',
-        ], 401);
+    {
+        // Eager load the departments along with the user
+        $user = auth()->user()->load('departments');
+    
+        // Return the user profile with departments
+        return $this->responseJson(true, 'User profile retrieved successfully', $user);
     }
-
-    $user->load('departments');
-
-    return $this->responseJson(true, 'User profile retrieved successfully', $user);
-}
 
 
     public function logout()
