@@ -26,14 +26,17 @@ class UsersController extends Controller
     }
 
 
-    public function profile()
-    {
+   public function profile()
+{
+    try {
         
-        $user = auth()->user()->load('departments');
-    
+        $user = auth()->user()->load('department');
         
         return $this->responseJson(true, 'User profile retrieved successfully', $user);
+    } catch (\Exception $e) {
+        return $this->responseJson(false, 'Failed to retrieve user profile', null, 500);
     }
+}
 
 
     public function logout()
