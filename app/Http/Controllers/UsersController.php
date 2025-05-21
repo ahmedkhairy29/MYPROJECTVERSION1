@@ -28,10 +28,10 @@ class UsersController extends Controller
 
     public function profile()
     {
-        // Eager load the departments along with the user
+        
         $user = auth()->user()->load('departments');
     
-        // Return the user profile with departments
+        
         return $this->responseJson(true, 'User profile retrieved successfully', $user);
     }
 
