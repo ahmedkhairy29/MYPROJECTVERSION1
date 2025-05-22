@@ -49,4 +49,22 @@ class UsersController extends Controller
             return $this->responseJson(false, 'Failed to logout, token invalidation error', null, 500);
         }
     }
+    
+    
+public function assignDepartment(Request $request, $userId)
+{
+    $validator = Validator::make($request->all(), [
+        'department_id' => 'required|exists:departments,id'
+    ]);
+
+    if ($validator->fails()) {
+        return $this->responseJson(false, 'Validation failed', $validator->errors(), 422);
+    }
+
+    $user = User::findOrFail($userId);
+    $user->department_id = $request->department_id;
+    $user->save();
+
+    return $this->responseJson(true, 'Department assigned successfully', $user);
+}
 }

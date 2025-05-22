@@ -29,8 +29,8 @@ class DepartmentController extends Controller
             return $this->responseJson(false, 'Validation failed', $validator->errors(), 422);
         }
     
-        $user = auth()->user();
-        \Log::info("Creating department for user: {$user->id}");
+       // $user = auth()->user();
+       // \Log::info("Creating department for user: {$user->id}");
 
         $department = $user->departments()->create([
             'name' => $request->name
@@ -80,9 +80,10 @@ class DepartmentController extends Controller
 
     public function getDepartments()
     {
-        $departments = auth()->user()->departments;
+        //$departments = auth()->user()->departments;
+        $departments = Department::with('users')->get();
     
-        // Check if departments are loaded
+        
         if ($departments->isEmpty()) {
             return $this->responseJson(false, 'No departments found for this user', null, 404);
         }
