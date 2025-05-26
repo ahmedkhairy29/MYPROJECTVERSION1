@@ -3,10 +3,11 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\PostController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\ActivateController;
-use App\Http\Controllers\PostController;
+use App\Http\Controllers\Auth\PasswordResetController;
 use Illuminate\Http\Request;
 
 Route::post('/register', [RegisterController::class, 'register']);
@@ -18,7 +19,9 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/profile', [UsersController::class, 'profile']);
    // Route::get('/profile', [UsersController::class, 'getUserProfile']);
     Route::post('/logout', [UsersController::class, 'logout']);
-    
+
+    Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLinkEmail']);
+    Route::post('/reset-password', [PasswordResetController::class, 'reset']);
     
 
     Route::post('/departments', [DepartmentController::class, 'addDepartment']);
