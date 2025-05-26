@@ -83,7 +83,7 @@ class DepartmentController extends Controller
         //$departments = auth()->user()->departments;
         $departments = Department::with('users')->get();
     
-        
+        // Check if departments are loaded
         if ($departments->isEmpty()) {
             return $this->responseJson(false, 'No departments found for this user', null, 404);
         }

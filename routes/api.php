@@ -6,6 +6,7 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\ActivateController;
+use App\Http\Controllers\PostController;
 use Illuminate\Http\Request;
 
 Route::post('/register', [RegisterController::class, 'register']);
@@ -24,6 +25,9 @@ Route::middleware(['auth:api'])->group(function () {
     Route::put('/departments/{id}', [DepartmentController::class, 'updateDepartment']);
     Route::delete('/departments/{id}', [DepartmentController::class, 'deleteDepartment']);
     Route::get('/departments', [DepartmentController::class, 'getDepartments']);
+
+    Route::post('/posts', [PostController::class, 'addPost']);
+    Route::get('/posts', [PostController::class, 'getUserPosts']);
 
     Route::get('/user', function (Request $request) {
         return response()->json(auth()->user());
