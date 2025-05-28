@@ -8,6 +8,8 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\ActivateController;
 use App\Http\Controllers\Auth\PasswordResetController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\Auth\ResetPasswordController;
 use Illuminate\Http\Request;
 
 Route::post('/register', [RegisterController::class, 'register']);
@@ -31,6 +33,10 @@ Route::middleware(['auth:api'])->group(function () {
 
     Route::post('/posts', [PostController::class, 'addPost']);
     Route::get('/posts', [PostController::class, 'getUserPosts']);
+
+    Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLink']);
+    Route::post('/reset-password', [ResetPasswordController::class, 'reset']);
+
 
     Route::get('/user', function (Request $request) {
         return response()->json(auth()->user());

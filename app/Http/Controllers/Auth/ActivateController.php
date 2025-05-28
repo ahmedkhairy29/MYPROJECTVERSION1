@@ -21,31 +21,35 @@ class ActivateController extends Controller
     }
 
     public function activateByEmail(Request $request)
-    {
-        $request->validate([
-            'token' => 'required|string'
-        ]);
+{
     
-        try {
-            $user = JWTAuth::setToken($request->token)->authenticate();
-        } catch (JWTException $e) {
-            return $this->responseJson(false, 'Invalid or expired token', null, 401);
-        }
+    $request->validate([
+        'token' => 'required|string',
+        'email' => 'required|email',
+    ]);
+
     
-        if (!$user) {
-            return $this->responseJson(false, 'User not found', null, 404);
-        }
-    
-        if ($user->is_active) {
-            return $this->responseJson(false, 'User is already activated', null, 400);
-        }
-    
-        $user->is_active = true;
-        $user->save();
-    
-        return $this->responseJson(true, 'User activated successfully', [
-            'name' => $user->name,
-            'email' => $user->email
-        ]);
+    $user = User::where('email', $request->email)
+                ->where('activation_token', $request->token)
+                ->first();
+
+    if (!$user) {
+        return $this->responseJson(false, 'Invalid token or email', null, 400);
     }
+
+    if ($user->is_active) {
+        return $this->responseJson(false, 'User is already activated', null, 400);
+    }
+
+    
+    $user->is_active = true;
+    $user->activation_token = null;
+    $user->save();
+
+    return $this->responseJson(true, 'User activated successfully', [
+        'name' => $user->name,
+        'email' => $user->email
+    ]);
+}
+
 } 

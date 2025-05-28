@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Database\Eloquent\Model;
 use App\Notifications\ResetPasswordNotification;
+use App\Notifications\AccountActivationNotification;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -83,6 +84,11 @@ public function posts()
 public function sendPasswordResetNotification($token)
 {
     $this->notify(new ResetPasswordNotification($token));
+}
+
+public function sendActivationNotification()
+{
+    $this->notify(new AccountActivationNotification($this->activation_token));
 }
 
 

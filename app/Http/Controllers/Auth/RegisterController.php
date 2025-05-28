@@ -7,7 +7,9 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use JWTAuth;
+
 
 
 class RegisterController extends Controller
@@ -34,21 +36,29 @@ class RegisterController extends Controller
          if ($validator->fails()) {
              return $this->responseJson(false, 'Validation failed', $validator->errors(), 422);
          }
+
+         $activationToken = Str::random(64);
+
      
          $user = User::create([
-             'name' => $request->name,
-             'email' => $request->email,
-             'password' => Hash::make($request->password),
-             'device_id' => $request->device_id,
-             'is_active' => false
+        'name' => $request->name,
+        'email' => $request->email,
+        'password' => Hash::make($request->password),
+        'device_id' => $request->device_id,
+        'is_active' => false,
+        'activation_token' => $activationToken,
+
          ]);
+
+         
             
-              $activationToken = JWTAuth::fromUser($user);
-        
-         return $this->responseJson(true, 'User registered. Use /api/activate-user to activate.', [
-            'name' => $user->name,
-            'email' => $user->email,
-            'activation_token' => $activationToken
+            $user->sendActivationNotification();
+
+    
+        return $this->responseJson(true, 'User registered. Check email for activation link.', [
+        'name' => $user->name,
+        'email' => $user->email,
+        //'activation_token' => $activationToken
         ], 201);
-     }
-} 
+      }
+   } 

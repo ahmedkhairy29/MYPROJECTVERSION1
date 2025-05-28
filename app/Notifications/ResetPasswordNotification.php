@@ -6,6 +6,9 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Hash;
 
 class ResetPasswordNotification extends Notification
 {
@@ -39,7 +42,7 @@ class ResetPasswordNotification extends Notification
         ->subject('Reset Your Password')
         ->greeting('Hello ' . $notifiable->name . ',')
         ->line('We received a request to reset your password.')
-        ->action('Reset Password', url('/reset-password?token=' . $this->token . '&email=' . urlencode($notifiable->email)))
+        ->action('Reset Password', env('FRONTEND_URL') . '/reset-password?token=' . $this->token . '&email=' . urlencode($notifiable->email))
         ->line('If you did not request a password reset, no further action is required.')
         ->salutation('Regards, ' . config('app.name'));
 }
@@ -55,4 +58,45 @@ class ResetPasswordNotification extends Notification
             //
         ];
     }
+     
+    public function sendResetLinkEmail(Request $request)
+{
+    $request->validate([
+        'email' => 'required|email|exists:users,email'
+    ]);
+
+    $status = Password::sendResetLink(
+        $request->only('email')
+    );
+
+    if ($status == Password::RESET_LINK_SENT) {
+        return response()->json(['message' => __($status)], 200);
+    } else {
+        return response()->json(['error' => __($status)], 400);
+    }
+}
+
+public function reset(Request $request)
+{
+    $request->validate([
+        'token' => 'required',
+        'email' => 'required|email|exists:users,email',
+        'password' => 'required|string|min:6|confirmed',
+    ]);
+
+    $status = Password::reset(
+        $request->only('email', 'password', 'password_confirmation', 'token'),
+        function ($user, $password) {
+            $user->password = Hash::make($password);
+            $user->save();
+        }
+    );
+
+    if ($status == Password::PASSWORD_RESET) {
+        return response()->json(['message' => __($status)], 200);
+    } else {
+        return response()->json(['error' => __($status)], 400);
+    }
+}
+
 }
