@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Hash;
+use App\Notifications\ResetPasswordNotification;
 
 class ResetPasswordNotification extends Notification
 {
@@ -98,5 +99,10 @@ public function reset(Request $request)
         return response()->json(['error' => __($status)], 400);
     }
 }
+
+   public function sendPasswordResetNotification($token)
+   {
+    $this->notify(new ResetPasswordNotification($token));
+   }
 
 }

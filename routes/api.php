@@ -16,15 +16,17 @@ Route::post('/register', [RegisterController::class, 'register']);
 Route::post('/login', [LoginController::class, 'login'])->name('login');
 
 Route::post('/activate-user', [ActivateController::class, 'activateByEmail']);
+ 
+
+Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLinkEmail']);
+Route::post('/reset-password', [PasswordResetController::class, 'reset']);
+ 
 
 Route::middleware(['auth:api'])->group(function () {
     Route::get('/profile', [UsersController::class, 'profile']);
    // Route::get('/profile', [UsersController::class, 'getUserProfile']);
     Route::post('/logout', [UsersController::class, 'logout']);
 
-    Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLinkEmail']);
-    Route::post('/reset-password', [PasswordResetController::class, 'reset']);
-    
 
     Route::post('/departments', [DepartmentController::class, 'addDepartment']);
     Route::put('/departments/{id}', [DepartmentController::class, 'updateDepartment']);
@@ -34,7 +36,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/posts', [PostController::class, 'addPost']);
     Route::get('/posts', [PostController::class, 'getUserPosts']);
 
-    Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLink']);
+    Route::post('/forgot-password', [ForgtPasswordController::class, 'sendResetLink']);
     Route::post('/reset-password', [ResetPasswordController::class, 'reset']);
 
 
