@@ -1,6 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\Auth\LoginController;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,14 +16,17 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/login', function () {
+Route::get('/login', function() { 
     return view('auth.login');
-});
+    })->name('login');
+//Route::post('/login', [LoginController::class, 'login']);
 
-Route::get('/forgot-password', function () {
-    return view('auth.forgot-password');
-});
+// Forgot password form and submit
+Route::get('/forgot-password', function() {
+    return view('auth.forgot-password'); });
+//Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail']);
 
+// Reset password form and submit
 Route::get('/reset-password', function () {
-    return view('auth.reset-password');
-});
+     return view('auth.reset-password'); });
+//Route::post('/reset-password', [ResetPasswordController::class, 'reset']);
