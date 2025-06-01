@@ -53,15 +53,18 @@
 </head>
 <body>
     <div class="box">
-        <h2>Reset Your Password</h2>
-        <form method="POST" action="{{ route('password.update') }}">
-            @csrf
-            <input type="hidden" name="token" value="{{ $token }}">
-            <input type="email" name="email" placeholder="Email" required>
-            <input type="password" name="password" placeholder="New Password" required>
-            <input type="password" name="password_confirmation" placeholder="Confirm Password" required>
-            <button type="submit">Reset Password</button>
-        </form>
+        <h2>Reset Password</h2>
+
+<form method="POST" action="{{ route('password.update') }}">
+    @csrf
+
+    <input type="hidden" name="token" value="{{ $token }}">
+    <input type="email" name="email" placeholder="Email" required>
+    <input type="password" name="password" placeholder="New Password" required>
+    <input type="password" name="password_confirmation" placeholder="Confirm Password" required>
+
+    <button type="submit">Reset Password</button>
+</form>
         <a href="/login">Back to Login</a>
     </div>
 </body>
