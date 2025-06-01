@@ -90,11 +90,20 @@
         <div class="login-box">
             <h2>Facebook</h2>
 
-            @if ($errors->any())
-                <div class="error">
-                    {{ $errors->first() }}
-                </div>
-            @endif
+           {{-- Success --}}
+@if (session('success'))
+    <div style="color: green;">{{ session('success') }}</div>
+@endif
+
+{{-- Errors --}}
+@if ($errors->any())
+    <div style="color: red;">
+        @foreach ($errors->all() as $error)
+            <div>{{ $error }}</div>
+        @endforeach
+    </div>
+@endif
+
 
             <form method="POST" action="{{ url('/login') }}">
                 @csrf

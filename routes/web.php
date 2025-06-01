@@ -32,3 +32,6 @@ Route::get('/reset-password', function (Request $request) {
 })->name('password.reset');
 
 Route::post('/reset-password', [PasswordResetController::class, 'reset'])->name('password.update');
+Route::get('/dashboard', function () {
+    return view('dashboard'); // create resources/views/dashboard.blade.php
+})->middleware('auth')->name('dashboard');
