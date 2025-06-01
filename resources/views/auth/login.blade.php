@@ -1,16 +1,27 @@
-@extends('layouts.app')
-
-@section('content')
+<!-- resources/views/auth/login.blade.php -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+</head>
+<body>
     <h2>Login</h2>
-    <form method="POST" action="{{ url('/api/login') }}">
+
+    @if ($errors->any())
+        <div style="color: red;">
+            {{ $errors->first() }}
+        </div>
+    @endif
+
+    <form method="POST" action="{{ url('/login') }}">
         @csrf
-        <div class="form-group">
-            <input type="email" name="email" placeholder="Email" class="form-control" required autofocus>
-        </div>
-        <div class="form-group">
-            <input type="password" name="password" placeholder="Password" class="form-control" required>
-        </div>
-        <button type="submit" class="btn">Log In</button>
+        <label>Email:</label>
+        <input type="email" name="email" required><br>
+
+        <label>Password:</label>
+        <input type="password" name="password" required><br>
+
+        <button type="submit">Login</button>
     </form>
-    <a href="#" class="link">Forgot password?</a>
-@endsection
+</body>
+</html>

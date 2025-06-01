@@ -1,9 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\ForgotPasswordController;
-use App\Http\Controllers\Auth\ResetPasswordController;
-use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Web\PasswordResetController;
+use App\Http\Controllers\Web\LoginController as WebLoginController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,17 +15,16 @@ use App\Http\Controllers\Auth\LoginController;
 |
 */
 
-Route::get('/login', function() { 
-    return view('auth.login');
-    })->name('login');
-//Route::post('/login', [LoginController::class, 'login']);
 
-// Forgot password form and submit
-Route::get('/forgot-password', function() {
-    return view('auth.forgot-password'); });
-//Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail']);
+Route::get('/login', [WebLoginController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [WebLoginController::class, 'login']);
+Route::post('/logout', [WebLoginController::class, 'logout'])->name('logout');
 
-// Reset password form and submit
-Route::get('/reset-password', function () {
-     return view('auth.reset-password'); });
-//Route::post('/reset-password', [ResetPasswordController::class, 'reset']);
+Route::get('/forgot-password', fn () => view('auth.forgot-password'))->name('password.request');
+Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLinkEmail'])->name('password.email');
+
+Route::get('/reset-password/{token}', function ($token) {
+    return view('auth.reset-password', ['token' => $token]);
+})->name('password.reset');
+
+Route::post('/reset-password', [PasswordResetController::class, 'reset'])->name('password.update');
